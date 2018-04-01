@@ -6,13 +6,25 @@ import { ElementHandle } from 'puppeteer';
  * @param {*} node
  * @param {*} selector
  */
-export async function queryInnerHTML(node: ElementHandle, selector: string): Promise<string> {
+export async function queryInnerHTML(node: ElementHandle, selector: string | string[]): Promise<string> {
   let resultStr = '';
-  if (selector != '') {
+  if (typeof selector == 'string' && selector != '') {
     // 单个选择器，选择元素，然后获取innerHTML
     let element = await node.$(selector);
     if (element != undefined) {
       resultStr = await elementHTML(element);
+    }
+  } else if (Array.isArray(selector)) {
+    // 数组选择器
+    if (selector.length == 1) {
+      // 数组中只有一个选择器，表示使用selectAll，然后将所有元素的innerHTML拼起来
+      let nodelist = await node.$$(selector[0]);
+      let strList = await Promise.all(nodelist.map(async node => elementHTML(node)));
+      return strList.join(' ');
+    } else {
+      //数组中有多个选择,递归每一项，然后拼起来
+      let strList = await Promise.all(selector.map(async _selector => await queryInnerHTML(node, _selector)));
+      resultStr = strList.join(' ');
     }
   }
   // 最后要把内容中的`&nbsp;`换成空格
@@ -42,28 +54,28 @@ export async function queryInnerText(node: ElementHandle, selector: string): Pro
   return resultStr || '';
 }
 
-export async function elementHTML(el: ElementHandle) {
+export async function elementHTML(el: ElementHandle): Promise<string> {
   let resultHandle = await el.executionContext().evaluateHandle((el: HTMLElement) => {
     return el.innerHTML;
   }, el);
   return await resultHandle.jsonValue();
 }
 
-export async function elementOuterHTML(el: ElementHandle) {
+export async function elementOuterHTML(el: ElementHandle): Promise<string> {
   let resultHandle = await el.executionContext().evaluateHandle((el: HTMLElement) => {
     return el.outerHTML;
   }, el);
   return await resultHandle.jsonValue();
 }
 
-export async function elementText(el: ElementHandle) {
+export async function elementText(el: ElementHandle): Promise<string> {
   let resultHandle = await el.executionContext().evaluateHandle((el: HTMLElement) => {
     return el.innerText;
   }, el);
   return await resultHandle.jsonValue();
 }
 
-export function durationTime(start, end) {
+export function durationTime(start, end): string {
   let startHour = parseInt(start.split(':')[0]);
   let startMinute = parseInt(start.split(':')[1]);
   let endHour = parseInt(end.split(':')[0]);

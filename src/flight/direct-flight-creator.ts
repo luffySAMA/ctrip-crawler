@@ -98,7 +98,7 @@ export class DirectFlightCreator {
       // this.propName 存的值是选择器
       let selector = this[propName];
       // 用selector到this.root中去找，返回的就是航班的信息
-      if (typeof selector === 'string') {
+      if (typeof selector === 'string' || Array.isArray(selector)) {
         this.flightInfo[propName] = await queryInnerHTML(this.rootElement, selector);
       } else if (typeof selector === 'function') {
         this.flightInfo[propName] = await selector(this.rootElement);

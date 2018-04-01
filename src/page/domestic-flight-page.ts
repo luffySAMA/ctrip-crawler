@@ -23,14 +23,15 @@ export class DomesticFlightPage implements FlightPage {
   }
 
   async wait(): Promise<void> {
-    await this.page.waitFor('#searchLoading', { hidden: true });
-    await this.page.waitFor(20);
-    await this.page.waitFor('#mask_loading', { hidden: true });
-    await this.page.waitFor(20);
-    // btnReSearch
-    let directFlightList = await this.page.$$('.search_table_header .J_header_row');
-    if (directFlightList.length == 0) {
-      let btnReSearch = await this.page.$('#btnReSearch');
+    // await this.page.waitFor('#searchLoading', { hidden: true });
+    // await this.page.waitFor(20);
+    // await this.page.waitFor('#mask_loading', { hidden: true });
+    // await this.page.waitFor(20);
+    // // btnReSearch
+    // let directFlightList = await this.page.$$('.search_table_header .J_header_row');
+    // if (directFlightList.length == 0) {
+    let btnReSearch = await this.page.$('#btnReSearch');
+    if (btnReSearch) {
       await btnReSearch.click();
       await this.page.waitFor(20);
       await this.page.waitFor('#searchLoading', { hidden: true });
@@ -38,6 +39,7 @@ export class DomesticFlightPage implements FlightPage {
       await this.page.waitFor('#mask_loading', { hidden: true });
       await this.page.waitFor(20);
     }
+    // }
   }
 
   async beforeDownload(): Promise<void> {
