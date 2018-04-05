@@ -7,6 +7,9 @@ import { ElementHandle } from 'puppeteer';
  * @param {*} selector
  */
 export async function queryInnerHTML(node: ElementHandle, selector: string | string[]): Promise<string> {
+  if (node == undefined) {
+    return '';
+  }
   let resultStr = '';
   if (typeof selector == 'string' && selector != '') {
     // 单个选择器，选择元素，然后获取innerHTML
@@ -32,6 +35,9 @@ export async function queryInnerHTML(node: ElementHandle, selector: string | str
   return resultStr || '';
 }
 export async function queryOuterHTML(node: ElementHandle, selector: string): Promise<string> {
+  if (node == undefined) {
+    return '';
+  }
   let resultStr = '';
   if (selector != '') {
     let element = await node.$(selector);
@@ -43,6 +49,9 @@ export async function queryOuterHTML(node: ElementHandle, selector: string): Pro
 }
 
 export async function queryInnerText(node: ElementHandle, selector: string): Promise<string> {
+  if (node == undefined) {
+    return '';
+  }
   let resultStr = '';
   if (selector != '') {
     // 单个选择器，选择元素，然后获取innerText

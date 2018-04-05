@@ -19,6 +19,8 @@ let mkdir = promisify(fs.mkdir);
   let task = new Task(browser);
   try {
     await task.run('HLD', 'TYN', '2018-04-17');
+    await task.run('tao', 'syd', '2018-04-17');
+    // await task.run('tao', 'syd', '2018-04-17');
   } catch (error) {
     console.log(error);
   }

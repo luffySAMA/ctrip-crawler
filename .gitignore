@@ -1,6 +1,6 @@
 /node_modules/
 /dist/
-/result/
+/result/**
 
 /.vscode/
 .DS_Store

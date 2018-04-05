@@ -53,20 +53,34 @@ export class DomesticFlightPage implements FlightPage {
             clearInterval(interval);
             setTimeout(() => {
               resolve();
-            }, 1000);
+            }, 200);
           }
-        }, 1000);
+        }, 200);
       });
     });
 
     // 找出中转的
     let flightHandlerList = await this.page.$$('.search_transfer_header.J_header_row.J_header_wrap');
-    await Promise.all(
-      flightHandlerList.map(async flightHandler => {
-        let popHandler = await flightHandler.$('.inb.center.J_trans_pop');
-        await popHandler.hover();
-      })
-    );
+
+    for (let i = 0; i < flightHandlerList.length; i++) {
+      let flightHandler = flightHandlerList[i];
+      let popHandler = await flightHandler.$('.inb.center.J_trans_pop');
+      await popHandler.hover();
+      await this.page.waitFor(100);
+      await popHandler.hover();
+      await this.page.waitFor(500);
+      await this.page.mouse.move(0, 0);
+      await this.page.waitFor(100);
+
+      // await this.page.waitFor(i => {
+      //   return document.querySelectorAll('.popup_transfer_detail').length == i + 1;
+      // }, i);
+    }
+    // let flightHandler = await this.page.$('.search_transfer_header.J_header_row.J_header_wrap');
+    // if (flightHandler) {
+    //   let popHandler = await flightHandler.$('.inb.center.J_trans_pop');
+    //   await popHandler.hover();
+    // }
   }
   async getFlightList(): Promise<FlightInfo[]> {
     // 国内直飞

@@ -20,10 +20,11 @@ export class InternationalFlightCreator {
    */
   toAirport = async (node: ElementHandle) => {
     let selector = [
-      '.flight-detail-expend .flight-detail-section:nth-child(3) .section-airport',
-      '.flight-detail-expend .flight-detail-section:nth-child(3) .section-terminal'
+      '.flight-detail-expend .flight-detail-section:last-child p:last-child .section-airport',
+      '.flight-detail-expend .flight-detail-section:last-child p:last-child .section-terminal'
     ];
     let airport = await queryInnerHTML(node, selector);
+    // 后面有个<span>准点率，去掉
     if (airport.indexOf('<') > 0) {
       return airport.substring(0, airport.indexOf('<'));
     } else {
@@ -61,8 +62,8 @@ export class InternationalFlightCreator {
    * 计划到达时间
    */
   endTime = [
-    '.flight-detail-expend .flight-detail-section:nth-child(3) .section-date',
-    '.flight-detail-expend .flight-detail-section:nth-child(3) .section-time'
+    '.flight-detail-expend .flight-detail-section:last-child p:last-child .section-date',
+    '.flight-detail-expend .flight-detail-section:last-child p:last-child .section-time'
   ];
   /**
    * 总飞行时长
@@ -136,6 +137,21 @@ export class InternationalFlightCreator {
   flight1Duration = '.flight-detail-expend .flight-detail-section:nth-child(1) p.section-flight-base+p .section-duration';
 
   /**
+   * 第二航班起飞时间
+   */
+  flight2StartTime = [
+    '.flight-detail-expend .flight-detail-section:nth-child(3) p:nth-child(3) .section-date',
+    '.flight-detail-expend .flight-detail-section:nth-child(3) p:nth-child(3) .section-time'
+  ];
+  /**
+   * 第二航班起飞机场
+   */
+  flight2StartAddress = [
+    '.flight-detail-expend .flight-detail-section:nth-child(3) p:nth-child(3) .section-airport',
+    '.flight-detail-expend .flight-detail-section:nth-child(3) p:nth-child(3) .section-terminal'
+  ];
+
+  /**
    * 第二航班到达时间
    */
   flight2ArriveTime = [
@@ -188,6 +204,20 @@ export class InternationalFlightCreator {
     }
   };
   /**
+   * 第3航班起飞时间
+   */
+  flight3StartTime = [
+    '.flight-detail-expend .flight-detail-section:nth-child(5) p:nth-child(3) .section-date',
+    '.flight-detail-expend .flight-detail-section:nth-child(5) p:nth-child(3) .section-time'
+  ];
+  /**
+   * 第3航班起飞机场
+   */
+  flight3StartAddress = [
+    '.flight-detail-expend .flight-detail-section:nth-child(5) p:nth-child(3) .section-airport',
+    '.flight-detail-expend .flight-detail-section:nth-child(5) p:nth-child(3) .section-terminal'
+  ];
+  /**
    * 第三航班到达时间
    */
   flight3ArriveTime = [
@@ -231,16 +261,28 @@ export class InternationalFlightCreator {
       this.flight1ArriveTime = '' as any;
       this.flight1Duration = '' as any;
       this.flight1OnTime = '' as any;
+      this.flight2StartAddress = '' as any;
+      this.flight2StartTime = '' as any;
       this.flight2ArriveAddress = '' as any;
       this.flight2ArriveTime = '' as any;
       this.flight2Duration = '' as any;
       this.flight2OnTime = '' as any;
+      this.flight3StartAddress = '' as any;
+      this.flight3StartTime = '' as any;
       this.flight3ArriveAddress = '' as any;
       this.flight3ArriveTime = '' as any;
       this.flight3Duration = '' as any;
       this.flight3OnTime = '' as any;
       this.stopTime = '' as any;
       this.stoppedCity = '' as any;
+    }
+    if (nodeList.length == 2) {
+      this.flight3StartAddress = '' as any;
+      this.flight3StartTime = '' as any;
+      this.flight3ArriveAddress = '' as any;
+      this.flight3ArriveTime = '' as any;
+      this.flight3Duration = '' as any;
+      this.flight3OnTime = '' as any;
     }
     for (let propName in this.flightInfo) {
       // this.propName 存的值是选择器

@@ -82,6 +82,14 @@ export class FlightInfo {
   /**
    * 第二航班到达时间
    */
+  flight2StartTime = '';
+  /**
+   * 第二航班到达机场
+   */
+  flight2StartAddress = '';
+  /**
+   * 第二航班到达时间
+   */
   flight2ArriveTime = '';
   /**
    * 第二航班到达机场
@@ -107,6 +115,14 @@ export class FlightInfo {
   /**
    * 第三航班到达时间
    */
+  flight3StartTime = '';
+  /**
+   * 第三航班到达机场
+   */
+  flight3StartAddress = '';
+  /**
+   * 第三航班到达时间
+   */
   flight3ArriveTime = '';
   /**
    * 第三航班到达机场
@@ -123,13 +139,7 @@ export class FlightInfo {
   constructor() {}
   toCsv() {
     let csv = `
-    ${this.airline},${this.flightNum},${this.airplane},${this.fromAirport},${this.startTime},${this.flight1ArriveAddress},${
-      this.flight1ArriveTime
-    },${this.flight1Duration},${this.flight1OnTime},${this.stopTime},${this.stoppedCity},${this.flight2ArriveAddress},${
-      this.flight2ArriveTime
-    },${this.flight2Duration},${this.flight2OnTime},${this.stopTime2},${this.stoppedCity2},${this.flight3ArriveAddress},${
-      this.flight3ArriveTime
-    },${this.flight3Duration},${this.flight3OnTime},${this.toAirport},${this.endTime},${this.duration},${this.priceEconomy},${this.onTime}`;
+    ${this.airline},${this.flightNum},${this.airplane},${this.fromAirport},${this.startTime},${this.flight1ArriveAddress},${this.flight1ArriveTime},${this.flight1Duration},${this.flight1OnTime},${this.stopTime},${this.stoppedCity},${this.flight2StartAddress},${this.flight2StartTime},${this.flight2Duration},${this.flight2OnTime},${this.stopTime2},${this.stoppedCity2},${this.flight2ArriveAddress},${this.flight2ArriveTime},${this.flight3StartAddress},${this.flight3StartTime},${this.flight3Duration},${this.flight3OnTime},${this.flight3ArriveAddress},${this.flight3ArriveTime},${this.toAirport},${this.endTime},${this.duration},${this.priceEconomy},${this.onTime}`;
     return csv;
   }
 }

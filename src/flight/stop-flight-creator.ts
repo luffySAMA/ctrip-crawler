@@ -114,7 +114,7 @@ export class StopFlightCreator {
   /**
    * 第二航班起飞时间
    */
-  flight2ArriveTime = async () => {
+  flight2StartTime = async () => {
     let start = await queryInnerHTML(this.stopElement, '.second_half .depart-time');
     let startSpan = await queryOuterHTML(this.stopElement, '.second_half .depart-time span');
     start = start.replace(startSpan, '');
@@ -123,7 +123,7 @@ export class StopFlightCreator {
   /**
    * 第二航班起飞机场
    */
-  flight2ArriveAddress = async () => {
+  flight2StartAddress = async () => {
     let selector = '.second_half .depart-airport';
     return queryInnerHTML(this.stopElement, selector);
   };
@@ -145,7 +145,7 @@ export class StopFlightCreator {
   };
 
   constructor(root: ElementHandle, stopElement: ElementHandle) {
-    if (root == undefined || stopElement == undefined) {
+    if (root == undefined) {
       return;
     }
     this.rootElement = root;
