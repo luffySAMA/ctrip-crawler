@@ -44,16 +44,18 @@ export class InternationalFlightPage implements FlightPage {
     // 滚动到底部
     await this.page.evaluate(() => {
       return new Promise(resolve => {
+        let scroll_times = 0; // 滚动次数,滚动10次还没到底，就不再滚动
         let interval = setInterval(() => {
-          if (window.scrollY + window.innerHeight < document.body.scrollHeight) {
+          if (scroll_times < 10 && window.scrollY + window.innerHeight < document.body.scrollHeight) {
             window.scroll(0, document.body.scrollHeight);
+            scroll_times++;
           } else {
             clearInterval(interval);
             setTimeout(() => {
               resolve();
-            }, 1000);
+            }, 200);
           }
-        }, 1000);
+        }, 200);
       });
     });
 
@@ -64,13 +66,6 @@ export class InternationalFlightPage implements FlightPage {
         linkMore.click();
       });
     });
-    // let linkMoreList = await this.page.$$('.flight-action-more a');
-    // await Promise.all(
-    //   linkMoreList.map(async linkMore => {
-    //     await linkMore.click();
-    //   })
-    // );
-    await this.page.waitFor(1000);
   }
   async getFlightList(): Promise<FlightInfo[]> {
     // 国际

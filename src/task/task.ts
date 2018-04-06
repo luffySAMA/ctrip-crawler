@@ -1,40 +1,46 @@
 import { InternationalFlightPage } from './../page/international-page';
 import { DomesticFlightPage } from '../page/domestic-flight-page';
 import * as fs from 'fs';
-import { Browser } from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
 import { formatDate } from '../util/util';
 
 import * as path from 'path';
-import { promisify } from 'util';
+// import { promisify } from 'util';
 import { FlightPage } from '../page/page';
 
-let mkdir = promisify(fs.mkdir);
-let stat = promisify(fs.stat);
+// let mkdir = promisify(fs.mkdir);
+// let stat = promisify(fs.stat);
 export class Task {
   browser: Browser;
-  constructor(browser: Browser) {
+  page: Page;
+  from: string;
+  to: string;
+  date: string;
+  finished = false;
+  constructor(browser: Browser, fromAirport: string, toAirport: string, date?: string) {
     this.browser = browser;
+    this.from = fromAirport;
+    this.to = toAirport;
+    this.date = date || formatDate(new Date());
   }
-  async run(fromAirport: string, toAirport: string, date?: string) {
-    if (date == undefined) {
-      date = formatDate(new Date());
-    }
+  async run() {
     let resultFolder = path.join(__dirname, '../../../result');
-    let airline = `${fromAirport}-${toAirport}`;
-    let airlineFolder = path.join(resultFolder, airline);
-    try {
-      await stat(airlineFolder);
-    } catch (error) {
-      await mkdir(airlineFolder);
-    }
-    let csvPath = path.join(resultFolder, airline, `${airline}-${date}.csv`);
-    let screenPath = path.join(resultFolder, airline, `${airline}-${date}.png`);
-    // let errScreenPath = path.join(resultFolder, airline, `${airline}-${date}.png`);
+    let airline = `${this.from}-${this.to}`;
+    // let airlineFolder = path.join(resultFolder, airline);
+    // try {
+    //   await stat(airlineFolder);
+    // } catch (error) {
+    //   await mkdir(airlineFolder);
+    // }
+    let csvPath = path.join(resultFolder, `${airline}-${this.date}.csv`);
+    // let screenPath = path.join(resultFolder, `${airline}-${this.date}.png`);
+    // let errScreenPath = path.join(resultFolder, `${airline}-${date}.png`);
     const page = await this.browser.newPage();
+    this.page = page;
     await page.setViewport({ width: 1440, height: 800 });
     try {
       // 进入页面
-      await page.goto(`http://flights.ctrip.com/booking/${airline}-day-1.html?ddate1=${date}`);
+      await page.goto(`http://flights.ctrip.com/booking/${airline}-day-1.html?ddate1=${this.date}`);
       let p: FlightPage;
       if (page.url().indexOf('flights.ctrip.com/booking/') != -1) {
         // 国内航班
@@ -54,11 +60,19 @@ export class Task {
       });
 
       fs.writeFile(csvPath, csv, () => {});
-      await page.screenshot({ path: screenPath, fullPage: true });
+      console.log(`${csvPath}\t${flightList.length}条航班`);
+      // await page.screenshot({ path: screenPath, fullPage: true });
     } catch (error) {
       console.log(error);
     } finally {
       await page.close();
+      this.finished = true;
+    }
+  }
+
+  cancel() {
+    if (!this.finished) {
+      this.page.close();
     }
   }
 }
