@@ -5,8 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "@types/puppeteer": "^1.2.0",
+    "@types/readline-sync": "^1.4.3",
     "async": "^2.6.0",
-    "puppeteer": "^1.2.0"
+    "puppeteer": "^1.2.0",
+    "readline-sync": "^1.4.9"
   },
   "devDependencies": {
     "@types/async": "^2.0.48",

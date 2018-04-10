@@ -81,4 +81,16 @@ export class InternationalFlightPage implements FlightPage {
 
     return this.flightList;
   }
+
+  async fromAirportName(): Promise<string> {
+    return await this.page.evaluate(() => {
+      return (<HTMLInputElement>document.querySelector('#homeCity')).value;
+    });
+  }
+
+  async toAirportName(): Promise<string> {
+    return await this.page.evaluate(() => {
+      return (<HTMLInputElement>document.querySelector('#destCity')).value;
+    });
+  }
 }

@@ -1,7 +1,7 @@
 import { Task } from './task';
 import { mapLimit } from 'async';
 
-const TASK_LIMIT = 10;
+const TASK_LIMIT = 30;
 export class Schedule {
   taskList: Task[];
 
@@ -10,11 +10,11 @@ export class Schedule {
   constructor(taskList: Task[]) {
     this.taskList = taskList;
   }
-  async start() {
+  async start(max_task: number = 1) {
     return new Promise(resolve => {
       mapLimit(
         this.taskList,
-        TASK_LIMIT,
+        Math.min(max_task, TASK_LIMIT),
         async (task, callback) => {
           return Promise.race([
             await task.run(),

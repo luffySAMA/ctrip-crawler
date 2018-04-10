@@ -23,22 +23,14 @@ export class DomesticFlightPage implements FlightPage {
   }
 
   async wait(): Promise<void> {
-    // await this.page.waitFor('#searchLoading', { hidden: true });
-    // await this.page.waitFor(20);
-    // await this.page.waitFor('#mask_loading', { hidden: true });
-    // await this.page.waitFor(20);
-    // // btnReSearch
-    // let directFlightList = await this.page.$$('.search_table_header .J_header_row');
-    // if (directFlightList.length == 0) {
-    let btnReSearch = await this.page.$('#btnReSearch');
-    if (btnReSearch) {
-      await btnReSearch.click();
-      await this.page.waitFor(20);
-      await this.page.waitFor('#searchLoading', { hidden: true });
-      await this.page.waitFor(20);
-      await this.page.waitFor('#mask_loading', { hidden: true });
-      await this.page.waitFor(20);
-    }
+    // let btnReSearch = await this.page.$('#btnReSearch');
+    // if (btnReSearch) {
+    //   await btnReSearch.click();
+    await this.page.waitFor(20);
+    await this.page.waitFor('#searchLoading', { hidden: true });
+    await this.page.waitFor(20);
+    await this.page.waitFor('#mask_loading', { hidden: true });
+    await this.page.waitFor(20);
     // }
   }
 
@@ -68,11 +60,10 @@ export class DomesticFlightPage implements FlightPage {
       await popHandler.hover();
       await this.page.waitFor(100);
       await popHandler.hover();
-      await this.page.waitFor(500);
+      await this.page.waitFor(300);
       await this.page.mouse.move(0, 0);
       await this.page.waitFor(100);
     }
-
   }
   async getFlightList(): Promise<FlightInfo[]> {
     // 国内直飞
@@ -97,5 +88,17 @@ export class DomesticFlightPage implements FlightPage {
       })
     );
     return this.flightList;
+  }
+
+  async fromAirportName(): Promise<string> {
+    return await this.page.evaluate(() => {
+      return (<HTMLInputElement>document.querySelector('#DCityName1')).value;
+    });
+  }
+
+  async toAirportName(): Promise<string> {
+    return await this.page.evaluate(() => {
+      return (<HTMLInputElement>document.querySelector('#ACityName1')).value;
+    });
   }
 }

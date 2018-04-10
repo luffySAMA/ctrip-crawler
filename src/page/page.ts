@@ -30,4 +30,8 @@ export interface FlightPage {
    * 抓取页面的航班信息
    */
   getFlightList(): Promise<Array<FlightInfo>>;
+
+  fromAirportName(): Promise<string>;
+
+  toAirportName(): Promise<string>;
 }
