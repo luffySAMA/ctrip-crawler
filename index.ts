@@ -29,7 +29,7 @@ let readFile = promisify(fs.readFile);
   let subFolder = path.join(resultFolder, date);
   await newFolder(subFolder);
 
-  const browser = await puppeteer.launch({ headless: headless });
+  const browser = await puppeteer.launch({ headless: headless, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   await login(browser);
   let fs1 = await readFile(path.join(__dirname, '../config/from-airport.txt'));
   let fs2 = await readFile(path.join(__dirname, '../config/to-airport.txt'));
