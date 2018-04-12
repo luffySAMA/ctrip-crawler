@@ -69,6 +69,7 @@ export class Task {
       });
 
       fs.appendFile(csvPath, csv, () => {});
+
       console.log(`${fromAirportName} -> ${toAirportName}\t${flightList.length}条航班`);
       // await page.screenshot({ path: screenPath, fullPage: true });
     } catch (error) {

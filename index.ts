@@ -6,7 +6,7 @@ import { Task } from './src/task/task';
 import { Schedule } from './src/task/schedule';
 import { Browser } from 'puppeteer';
 // import * as readlineSync from 'readline-sync';
-// import { formatDate } from './src/util/util';
+import { formatDate } from './src/util/util';
 import { newFolder } from './src/util/file-util';
 
 let readFile = promisify(fs.readFile);
@@ -15,11 +15,11 @@ let readFile = promisify(fs.readFile);
   let cf = await readFile(path.join(__dirname, '../config/config.txt'));
   let config = cf.toString().split('\n');
 
-  let date = config[1];
+  let date = config[1] || formatDate(new Date());
   let thread = parseInt(config[3]);
   let headless = config[5] == 'Y' ? false : true;
-
-  console.log(`加载配置文件${date}, ${headless}, ${thread}`);
+  thread = headless ? thread : 1;
+  console.log(`加载配置文件\n 日期:${date}, 窗口显示:${!headless}, 线程数:${thread}`);
 
   // headless = !readlineSync.keyInYNStrict('你是否想要观看爬取过程?');
   // date = readlineSync.question(`输入要抓取的航班日期(默认${date}): `, { defaultInput: date });
@@ -29,7 +29,7 @@ let readFile = promisify(fs.readFile);
   let subFolder = path.join(resultFolder, date);
   await newFolder(subFolder);
 
-  const browser = await puppeteer.launch({ headless: headless, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  const browser = await puppeteer.launch({ headless: headless });
   await login(browser);
   let fs1 = await readFile(path.join(__dirname, '../config/from-airport.txt'));
   let fs2 = await readFile(path.join(__dirname, '../config/to-airport.txt'));
@@ -52,7 +52,7 @@ let readFile = promisify(fs.readFile);
 
     let schedule = new Schedule(taskList);
     // 如果观看的话，一次只执行一个任务
-    await schedule.start(headless ? thread : 1);
+    await schedule.start(thread);
     await browser.close();
   } catch (error) {
     console.log(error);
