@@ -53,7 +53,8 @@ export class Task {
       await p.beforeDownload();
       let fromAirportName = await p.fromAirportName();
       let toAirportName = await p.toAirportName();
-
+      fromAirportName = fromAirportName || this.from;
+      toAirportName = toAirportName || this.to;
       let csvPath = path.join(subFolder, `${fromAirportName}.csv`);
       let csv = '';
       let exist = await isFileExist(csvPath);
@@ -78,7 +79,7 @@ export class Task {
     } catch (error) {
       console.log(error);
       fs.appendFile(failFile, `${this.from},${this.to}\n`, () => {});
-      fs.appendFile(errorFile, `${new Date().toString()}\t${error}\n`, () => {});
+      fs.appendFile(errorFile, `${new Date().toString()}\t${this.from} -> ${this.to}\t${error}\n`, () => {});
       // return;
     } finally {
       await page.close();
