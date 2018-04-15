@@ -33,18 +33,31 @@ let readFile = promisify(fs.readFile);
   await login(browser);
   let fs1 = await readFile(path.join(__dirname, '../config/from-airport.txt'));
   let fs2 = await readFile(path.join(__dirname, '../config/to-airport.txt'));
+  let fs3 = await readFile(path.join(__dirname, '../config/save.txt'));
   let fromList = fs1.toString().split('\n');
   let toList = fs2.toString().split('\n');
-
+  let [temp_from, temp_to] = fs3.toString().split('\n');
+  let from_index = 0,
+    to_index = 0;
   console.log(`找到起飞机场${fromList.length}个，目的机场${toList.length}个`);
+  if (temp_from != undefined && temp_to != undefined) {
+    from_index = fromList.indexOf(temp_from);
+    to_index = toList.indexOf(temp_to);
+    console.log(`上次运行到从 ${temp_from}(${from_index}) 到 ${temp_to}(${to_index}) 的航班，正在继续`);
+  }
 
   let taskList: Task[] = [];
   try {
-    for (var i = 0; i < fromList.length; i++) {
+    for (var i = from_index; i < fromList.length; i++) {
       for (var j = 0; j < toList.length; j++) {
+        if (i == from_index && j < to_index) {
+          continue;
+        }
         if (fromList[i] != toList[j]) {
-          let task = new Task(browser, fromList[i], toList[j], date);
-          taskList.push(task);
+          if (fromList[i].length > 0 && toList[j].length > 0) {
+            let task = new Task(browser, fromList[i], toList[j], date);
+            taskList.push(task);
+          }
         }
       }
     }
@@ -68,7 +81,7 @@ let readFile = promisify(fs.readFile);
     await page.type('#npwd', password, { delay: 0 });
     let button = await page.$('#nsubmit');
     await button.click();
-    await page.waitFor(500);
+    await page.waitFor(2000);
     await page.close();
   }
 })();

@@ -27,6 +27,7 @@ export class Task {
   }
   async run() {
     let resultFolder = path.join(__dirname, '../../../result');
+    let saveFile = path.join(__dirname, '../../../config/save.txt');
     let airline = `${this.from}-${this.to}`;
     let subFolder = path.join(resultFolder, this.date);
     // let csvPath = path.join(subFolder, `${this.from}.csv`);
@@ -69,7 +70,7 @@ export class Task {
       });
 
       fs.appendFile(csvPath, csv, () => {});
-
+      fs.writeFile(saveFile, `${this.from}\n${this.to}`, () => {});
       console.log(`${fromAirportName} -> ${toAirportName}\t${flightList.length}条航班`);
       // await page.screenshot({ path: screenPath, fullPage: true });
     } catch (error) {
