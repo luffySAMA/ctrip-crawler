@@ -37,7 +37,6 @@ let readFile = promisify(fs.readFile);
   let fs4 = await readFile(path.join(__dirname, '../config/fail.txt'));
   let fromList = fs1.toString().split('\n');
   let toList = fs2.toString().split('\n');
-  let [temp_from, temp_to] = fs3.toString().split('\n');
   let errList = fs4.toString().split('\n');
   let from_index = 0,
     to_index = 0;
@@ -45,10 +44,16 @@ let readFile = promisify(fs.readFile);
   removeEmptyLine(toList);
   removeEmptyLine(errList);
   console.log(`找到起飞机场${fromList.length}个，目的机场${toList.length}个`);
-  if (temp_from != undefined && temp_to != undefined) {
+  let [temp_from, temp_to] = fs3.toString().split('\n');
+  if (temp_from != '' && temp_to != '') {
     from_index = fromList.indexOf(temp_from);
     to_index = toList.indexOf(temp_to);
-    console.log(`上次运行到从 ${temp_from}(${from_index}) 到 ${temp_to}(${to_index}) 的航班，有${errList.length}个失败航班，正在继续`);
+    if (from_index != -1 && to_index != -1) {
+      console.log(`上次运行到从 ${temp_from}(${from_index}) 到 ${temp_to}(${to_index}) 的航班，有${errList.length}个失败航班，正在继续`);
+    } else {
+      from_index = 0;
+      to_index = 0;
+    }
   }
   fs.writeFile(path.join(__dirname, '../config/fail.txt'), ``, () => {});
   let taskList: Task[] = [];
