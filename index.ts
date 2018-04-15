@@ -89,11 +89,13 @@ let readFile = promisify(fs.readFile);
   }
 
   async function login(browser: Browser) {
+    let fs = await readFile(path.join(__dirname, '../config/fail.txt'));
+    let account = fs.toString().split('\n');
+    let username = account[1];
+    let password = account[3];
     const page = await browser.newPage();
     await page.setViewport({ width: 800, height: 600 });
     await page.goto('https://passport.ctrip.com/user/login?BackUrl=http%3A%2F%2Fwww.ctrip.com%2F');
-    let username = '18936040203';
-    let password = '18936040203';
     await page.type('#nloginname', username, { delay: 0 });
     await page.type('#npwd', password, { delay: 0 });
     let button = await page.$('#nsubmit');
