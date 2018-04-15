@@ -28,6 +28,8 @@ export class Task {
   async run() {
     let resultFolder = path.join(__dirname, '../../../result');
     let saveFile = path.join(__dirname, '../../../config/save.txt');
+    let failFile = path.join(__dirname, '../../../config/fail.txt');
+    let errorFile = path.join(__dirname, '../../../error.log');
     let airline = `${this.from}-${this.to}`;
     let subFolder = path.join(resultFolder, this.date);
     // let csvPath = path.join(subFolder, `${this.from}.csv`);
@@ -75,6 +77,8 @@ export class Task {
       // await page.screenshot({ path: screenPath, fullPage: true });
     } catch (error) {
       console.log(error);
+      fs.appendFile(failFile, `${this.from},${this.to}\n`, () => {});
+      fs.appendFile(errorFile, `${new Date().toString()}\t${error}\n`, () => {});
       // return;
     } finally {
       await page.close();

@@ -34,30 +34,42 @@ let readFile = promisify(fs.readFile);
   let fs1 = await readFile(path.join(__dirname, '../config/from-airport.txt'));
   let fs2 = await readFile(path.join(__dirname, '../config/to-airport.txt'));
   let fs3 = await readFile(path.join(__dirname, '../config/save.txt'));
+  let fs4 = await readFile(path.join(__dirname, '../config/fail.txt'));
   let fromList = fs1.toString().split('\n');
   let toList = fs2.toString().split('\n');
   let [temp_from, temp_to] = fs3.toString().split('\n');
+  let errList = fs4.toString().split('\n');
   let from_index = 0,
     to_index = 0;
+  removeEmptyLine(fromList);
+  removeEmptyLine(toList);
+  removeEmptyLine(errList);
   console.log(`找到起飞机场${fromList.length}个，目的机场${toList.length}个`);
   if (temp_from != undefined && temp_to != undefined) {
     from_index = fromList.indexOf(temp_from);
     to_index = toList.indexOf(temp_to);
-    console.log(`上次运行到从 ${temp_from}(${from_index}) 到 ${temp_to}(${to_index}) 的航班，正在继续`);
+    console.log(`上次运行到从 ${temp_from}(${from_index}) 到 ${temp_to}(${to_index}) 的航班，有${errList.length}个失败航班，正在继续`);
   }
-
+  fs.writeFile(path.join(__dirname, '../config/fail.txt'), ``, () => {});
   let taskList: Task[] = [];
   try {
+    for (var i = 0; i < errList.length; i++) {
+      let [from, to] = errList[i].split(',');
+      if (from != '' && to != '' && from != to) {
+        let task = new Task(browser, from, to, date);
+        taskList.push(task);
+      }
+    }
     for (var i = from_index; i < fromList.length; i++) {
       for (var j = 0; j < toList.length; j++) {
         if (i == from_index && j < to_index) {
           continue;
         }
-        if (fromList[i] != toList[j]) {
-          if (fromList[i].length > 0 && toList[j].length > 0) {
-            let task = new Task(browser, fromList[i], toList[j], date);
-            taskList.push(task);
-          }
+        let from = fromList[i];
+        let to = toList[j];
+        if (from != '' && to != '' && from != to) {
+          let task = new Task(browser, from, to, date);
+          taskList.push(task);
         }
       }
     }
@@ -83,5 +95,11 @@ let readFile = promisify(fs.readFile);
     await button.click();
     await page.waitFor(2000);
     await page.close();
+  }
+
+  function removeEmptyLine(content: string[]) {
+    if (content[content.length - 1] == '') {
+      content.splice(content.length - 1, 1);
+    }
   }
 })();

@@ -66,6 +66,12 @@ export class DomesticFlightPage implements FlightPage {
     }
   }
   async getFlightList(): Promise<FlightInfo[]> {
+    // 没有航班
+    let errEl = await this.page.$('#J_searchError');
+    if (errEl != undefined) {
+      this.flightList = [];
+      return this.flightList;
+    }
     // 国内直飞
     let directFlightList = await this.page.$$('.search_table_header .J_header_row');
 
@@ -92,13 +98,15 @@ export class DomesticFlightPage implements FlightPage {
 
   async fromAirportName(): Promise<string> {
     return await this.page.evaluate(() => {
-      return (<HTMLInputElement>document.querySelector('#DCityName1')).value;
+      let input = <HTMLInputElement>document.querySelector('#DCityName1');
+      return input && input.value;
     });
   }
 
   async toAirportName(): Promise<string> {
     return await this.page.evaluate(() => {
-      return (<HTMLInputElement>document.querySelector('#ACityName1')).value;
+      let input = <HTMLInputElement>document.querySelector('#ACityName1');
+      return input && input.value;
     });
   }
 }
