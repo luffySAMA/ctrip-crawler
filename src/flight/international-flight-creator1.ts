@@ -4,7 +4,7 @@ import { queryInnerHTML, queryInnerText } from '../util/util';
 /**
  * 国际航班
  */
-export class InternationalFlightCreator {
+export class InternationalFlightCreator1 {
   flightInfo: FlightInfo;
   rootElement: ElementHandle;
 

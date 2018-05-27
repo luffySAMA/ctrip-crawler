@@ -89,18 +89,25 @@ let readFile = promisify(fs.readFile);
   }
 
   async function login(browser: Browser) {
-    let fs = await readFile(path.join(__dirname, '../config/fail.txt'));
+    let fs = await readFile(path.join(__dirname, '../config/account.txt'));
     let account = fs.toString().split('\n');
     let username = account[1];
     let password = account[3];
     const page = await browser.newPage();
-    await page.setViewport({ width: 800, height: 600 });
+    await page.setViewport({ width: 1440, height: 900 });
     await page.goto('https://passport.ctrip.com/user/login?BackUrl=http%3A%2F%2Fwww.ctrip.com%2F');
-    await page.type('#nloginname', username, { delay: 0 });
-    await page.type('#npwd', password, { delay: 0 });
+    const executionContext = await page.mainFrame().executionContext();
+    const result = await executionContext.evaluate(() => document.getElementById('normalview').style.display);
+    if (result == 'none') {
+      await page.close();
+      // 已登陆
+      return;
+    }
+    await page.type('#nloginname', username, { delay: 10 });
+    await page.type('#npwd', password, { delay: 10 });
     let button = await page.$('#nsubmit');
     await button.click();
-    await page.waitFor(2000);
+    await page.waitFor(3000);
     await page.close();
   }
 

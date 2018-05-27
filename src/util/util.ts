@@ -56,18 +56,24 @@ export async function queryOuterHTML(node: ElementHandle, selector: string): Pro
   }
 }
 
-export async function queryInnerText(node: ElementHandle, selector: string): Promise<string> {
+export async function queryInnerText(node: ElementHandle, selector: string | string[]): Promise<string> {
   try {
     if (node == undefined) {
       return '';
     }
     let resultStr = '';
-    if (selector != '') {
-      // 单个选择器，选择元素，然后获取innerText
-      let element = await node.$(selector);
-      if (element != undefined) {
-        resultStr = await elementText(element);
+    if (typeof selector == 'string') {
+      if (selector != '') {
+        // 单个选择器，选择元素，然后获取innerText
+        let element = await node.$(selector);
+        if (element != undefined) {
+          resultStr = await elementText(element);
+        }
       }
+    } else if (Array.isArray(selector)) {
+      //数组中有多个选择,递归每一项，然后拼起来
+      let strList = await Promise.all(selector.map(async _selector => await queryInnerText(node, _selector)));
+      resultStr = strList.join(' ');
     }
     return resultStr || '';
   } catch (error) {

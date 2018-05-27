@@ -1,9 +1,9 @@
 import { FlightPage } from './page';
 import { FlightInfo } from '../flight/flight-info';
 import { Page } from 'puppeteer';
-import { InternationalFlightCreator } from '../flight/international-flight-creator';
+import { InternationalFlightCreator2 } from '../flight/international-flight-creator2';
 
-export class InternationalFlightPage implements FlightPage {
+export class InternationalFlightPage2 implements FlightPage {
   flightList: FlightInfo[];
   page: Page;
 
@@ -22,19 +22,19 @@ export class InternationalFlightPage implements FlightPage {
   }
 
   async wait(): Promise<void> {
-    await this.page.waitFor('.loading_animate', { hidden: true });
+    await this.page.waitFor('#loading', { hidden: true });
     await this.page.waitFor(20);
-    await this.page.waitFor('.search_loading', { hidden: true });
+    await this.page.waitFor('img[src*=loading]', { hidden: true });
     await this.page.waitFor(20);
     let flightList = await this.page.$$('.flight-item');
     if (flightList.length == 0) {
-      let btnSearch = await this.page.$('#btnSearch');
+      let btnSearch = await this.page.$('.search-btn');
       if (btnSearch != undefined) {
         await btnSearch.click();
         await this.page.waitFor(20);
-        await this.page.waitFor('.loading_animate', { hidden: true });
+        await this.page.waitFor('#loading', { hidden: true });
         await this.page.waitFor(20);
-        await this.page.waitFor('.search_loading', { hidden: true });
+        await this.page.waitFor('img[src*=loading]', { hidden: true });
         await this.page.waitFor(20);
       }
     }
@@ -61,20 +61,19 @@ export class InternationalFlightPage implements FlightPage {
 
     // 展开详情，获取准点率
 
-    await this.page.evaluate(() => {
-      document.querySelectorAll('.flight-action-more a').forEach((linkMore: HTMLAnchorElement) => {
-        linkMore.click();
-      });
-    });
+    // await this.page.evaluate(() => {
+    //   document.querySelectorAll('.flight-action-more a').forEach((linkMore: HTMLAnchorElement) => {
+    //     linkMore.click();
+    //   });
+    // });
   }
   async getFlightList(): Promise<FlightInfo[]> {
-
     // 国际
     let flightList = await this.page.$$('.flight-item');
 
     await Promise.all(
       flightList.map(async flight => {
-        let creator = new InternationalFlightCreator(flight);
+        let creator = new InternationalFlightCreator2(flight, this.page);
         let flightInfo = await creator.createFlightInfo();
         this.flightList.push(flightInfo);
       })
@@ -85,14 +84,14 @@ export class InternationalFlightPage implements FlightPage {
 
   async fromAirportName(): Promise<string> {
     return await this.page.evaluate(() => {
-      let input = <HTMLInputElement>document.querySelector('#homeCity');
+      let input = <HTMLInputElement>document.querySelector('input[name=owDCity]');
       return input && input.value;
     });
   }
 
   async toAirportName(): Promise<string> {
     return await this.page.evaluate(() => {
-      let input = <HTMLInputElement>document.querySelector('#destCity');
+      let input = <HTMLInputElement>document.querySelector('input[name=owACity]');
       return input && input.value;
     });
   }

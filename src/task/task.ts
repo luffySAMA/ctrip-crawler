@@ -1,4 +1,5 @@
-import { InternationalFlightPage } from './../page/international-page';
+import { InternationalFlightPage1 } from './../page/international-page1';
+import { InternationalFlightPage2 } from './../page/international-page2';
 import { DomesticFlightPage } from '../page/domestic-flight-page';
 import { Browser, Page } from 'puppeteer';
 import { formatDate } from '../util/util';
@@ -47,7 +48,12 @@ export class Task {
         p = new DomesticFlightPage(page);
       } else {
         // 国际航班
-        p = new InternationalFlightPage(page);
+        let v2 = await page.$('.modify-search-v2');
+        if (v2 == undefined) {
+          p = new InternationalFlightPage1(page);
+        } else {
+          p = new InternationalFlightPage2(page);
+        }
       }
       await p.wait();
       await p.beforeDownload();
