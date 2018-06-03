@@ -71,13 +71,12 @@ export class InternationalFlightPage2 implements FlightPage {
     // 国际
     let flightList = await this.page.$$('.flight-item');
 
-    await Promise.all(
-      flightList.map(async flight => {
-        let creator = new InternationalFlightCreator2(flight, this.page);
-        let flightInfo = await creator.createFlightInfo();
-        this.flightList.push(flightInfo);
-      })
-    );
+    for (let i = 0; i < flightList.length; i++) {
+      let flight = flightList[i];
+      let creator = new InternationalFlightCreator2(flight, this.page);
+      let flightInfo = await creator.createFlightInfo();
+      this.flightList.push(flightInfo);
+    }
 
     return this.flightList;
   }

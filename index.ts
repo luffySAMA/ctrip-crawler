@@ -4,7 +4,7 @@ import * as path from 'path';
 import { promisify } from 'util';
 import { Task } from './src/task/task';
 import { Schedule } from './src/task/schedule';
-import { Browser } from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
 // import * as readlineSync from 'readline-sync';
 import { formatDate } from './src/util/util';
 import { newFolder } from './src/util/file-util';
@@ -89,25 +89,11 @@ let readFile = promisify(fs.readFile);
   }
 
   async function login(browser: Browser) {
-    let fs = await readFile(path.join(__dirname, '../config/account.txt'));
-    let account = fs.toString().split('\n');
-    let username = account[1];
-    let password = account[3];
     const page = await browser.newPage();
     await page.setViewport({ width: 1440, height: 900 });
     await page.goto('https://passport.ctrip.com/user/login?BackUrl=http%3A%2F%2Fwww.ctrip.com%2F');
-    const executionContext = await page.mainFrame().executionContext();
-    const result = await executionContext.evaluate(() => document.getElementById('normalview').style.display);
-    if (result == 'none') {
-      await page.close();
-      // 已登陆
-      return;
-    }
-    await page.type('#nloginname', username, { delay: 10 });
-    await page.type('#npwd', password, { delay: 10 });
-    let button = await page.$('#nsubmit');
-    await button.click();
-    await page.waitFor(3000);
+    let success = await loginPage(page);
+    console.log(`登录${success ? '成功' : '失败'}`);
     await page.close();
   }
 
@@ -117,3 +103,41 @@ let readFile = promisify(fs.readFile);
     }
   }
 })();
+export async function loginPage(page: Page) {
+  let fs = await readFile(path.join(__dirname, '../config/account.txt'));
+  let account = fs.toString().split('\n');
+  let username = account[1];
+  let password = account[3];
+  const result = await page.evaluate(() => {
+    let form = <HTMLElement>document.querySelector('#normalview');
+    return form && form.style.display;
+  });
+  if (result == 'none') {
+    await page.type('#personpwd', password, { delay: 10 });
+    let button = await page.$('#personSubmit');
+    await button.click();
+    await page.waitFor(2000);
+  } else {
+    await page.type('#nloginname', username, { delay: 10 });
+    await page.type('#npwd', password, { delay: 10 });
+    let autoLogin = await page.$('#normal30day');
+    if (autoLogin) {
+      let checked = await page.evaluate(input => {
+        return input && input.value;
+      }, autoLogin);
+      if (!checked) {
+        await autoLogin.click();
+      }
+    }
+    let button = await page.$('#nsubmit');
+    await button.click();
+    await page.waitFor(2000);
+  }
+  let url = page.url();
+  if (url.indexOf('passport.ctrip.com/user/login') != -1) {
+    // 十分钟后重新登录
+    await page.waitFor(10 * 60 * 1000);
+    await page.reload();
+    await loginPage(page);
+  }
+}

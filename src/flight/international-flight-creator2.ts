@@ -8,6 +8,7 @@ export class InternationalFlightCreator2 {
   page: Page;
   flightInfo: FlightInfo;
   rootElement: ElementHandle;
+  popElement: ElementHandle;
   /**
    * 起飞机场
    */
@@ -82,18 +83,18 @@ export class InternationalFlightCreator2 {
    */
   onTime = '';
   /**
-   * 第二班准点率
-   */
-  // this.onTime = '.service span[data-bit="OnTimeRate"]';
-  /**
    * 经停
    */
-  stoppedCity = ['.transfer-info .prompt', '.transfer-info .city'];
+  stoppedCity = async (node: ElementHandle, pop: ElementHandle) => {
+    return await queryInnerText(pop, ['.each-box:nth-child(1) .transfer-info .prompt', '.each-box:nth-child(1) .transfer-info .city']);
+  };
 
   /**
    * 中转停留时间
    */
-  stopTime = '.transfer-info .hint';
+  stopTime = async (node: ElementHandle, pop: ElementHandle) => {
+    return await queryInnerText(pop, ['.each-box:nth-child(1) .transfer-info .prompt', '.each-box:nth-child(1) .transfer-info .hint']);
+  };
 
   /**
    * 第一航班到达时间
@@ -148,7 +149,9 @@ export class InternationalFlightCreator2 {
   /**
    * 第二航班准点率
    */
-  flight2OnTime = '';
+  flight2OnTime = async (node: ElementHandle, pop: ElementHandle) => {
+    return await queryInnerText(pop, '.each-box:nth-child(2) .extra .extra-text');
+  };
   /**
    * 第二航班飞行时间
    */
@@ -166,7 +169,7 @@ export class InternationalFlightCreator2 {
    * 中转停留时间
    */
   stopTime2 = async (node: ElementHandle, pop: ElementHandle) => {
-    return await queryInnerText(pop, ['.each-box:nth-child(3) .transfer-info .prompt', '.each-box:nth-child(3) .transfer-info .hint']);
+    return await queryInnerText(pop, ['.each-box:nth-child(2) .transfer-info .prompt', '.each-box:nth-child(2) .transfer-info .hint']);
   };
 
   /**
@@ -197,12 +200,14 @@ export class InternationalFlightCreator2 {
   /**
    * 第三航班准点率
    */
-  flight3OnTime = '';
+  flight3OnTime = async (node: ElementHandle, pop: ElementHandle) => {
+    return await queryInnerText(pop, '.each-box:nth-child(3) .extra .extra-text');
+  };
   /**
    * 第三航班飞行时间
    */
   flight3Duration = async (node: ElementHandle, pop: ElementHandle) => {
-    return await queryInnerText(pop, '.each-box:nth-child(2) .extra .consume');
+    return await queryInnerText(pop, '.each-box:nth-child(3) .extra .consume');
   };
 
   constructor(root: ElementHandle, page: Page) {
@@ -217,7 +222,6 @@ export class InternationalFlightCreator2 {
     this.flightInfo = new FlightInfo();
     // 鼠标放在中转上
     let popHandler = await this.rootElement.$('.arrow-transfer');
-    let popInfo: ElementHandle;
     if (popHandler == undefined) {
       // 直飞
       this.flight1ArriveAddress = '' as any;
@@ -240,14 +244,14 @@ export class InternationalFlightCreator2 {
       this.stoppedCity = '' as any;
     } else {
       await popHandler.hover();
-      await this.page.waitFor(100);
+      await this.page.waitFor(300);
       await popHandler.hover();
       await this.page.waitFor(300);
       await this.page.mouse.move(0, 0);
-      await this.page.waitFor(100);
-      popInfo = await this.page.$('.popups.popup-flightinfo');
-      if (popInfo != undefined) {
-        let boxList = await popInfo.$$('.each-box');
+      await this.page.waitFor(300);
+      this.popElement = await this.page.$('.popups.popup-flightinfo');
+      if (this.popElement != undefined) {
+        let boxList = await this.popElement.$$('.each-box');
         if (boxList != undefined && boxList.length == 2) {
           this.flight3StartAddress = '' as any;
           this.flight3StartTime = '' as any;
@@ -265,7 +269,7 @@ export class InternationalFlightCreator2 {
       if (typeof selector === 'string' || Array.isArray(selector)) {
         this.flightInfo[propName] = await queryInnerText(this.rootElement, selector);
       } else if (typeof selector === 'function') {
-        this.flightInfo[propName] = await selector(this.rootElement, popInfo);
+        this.flightInfo[propName] = await selector(this.rootElement, this.popElement);
       }
     }
     return this.flightInfo;

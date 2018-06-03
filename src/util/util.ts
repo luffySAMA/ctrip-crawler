@@ -131,7 +131,7 @@ export function durationTime(start, end): string {
       minutes += 60;
       hours -= 1;
     }
-    return `${hours}h ${minutes}m`;
+    return `${hours}小时${minutes}分`;
   } catch (error) {
     return '';
   }

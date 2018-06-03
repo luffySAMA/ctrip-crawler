@@ -16,13 +16,15 @@ export class Schedule {
         this.taskList,
         Math.min(max_task, TASK_LIMIT),
         async (task, callback) => {
+          // await task.run();
+          // callback();
           return Promise.race([
             await task.run(),
             new Promise(resolve => {
               setTimeout(() => {
                 task.cancel();
                 resolve();
-              }, 30000);
+              }, 30 * 60 * 1000);
             })
           ]).then(() => {
             callback();
