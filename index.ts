@@ -104,6 +104,7 @@ let readFile = promisify(fs.readFile);
   }
 })();
 export async function loginPage(page: Page) {
+  console.log('登录');
   let fs = await readFile(path.join(__dirname, '../config/account.txt'));
   let account = fs.toString().split('\n');
   let username = account[1];
@@ -136,6 +137,8 @@ export async function loginPage(page: Page) {
   let url = page.url();
   if (url.indexOf('passport.ctrip.com/user/login') != -1) {
     // 十分钟后重新登录
+    console.log('休息一下');
+
     await page.waitFor(10 * 60 * 1000);
     await page.reload();
     await loginPage(page);

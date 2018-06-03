@@ -93,7 +93,7 @@ export class InternationalFlightCreator2 {
    * 中转停留时间
    */
   stopTime = async (node: ElementHandle, pop: ElementHandle) => {
-    return await queryInnerText(pop, ['.each-box:nth-child(1) .transfer-info .prompt', '.each-box:nth-child(1) .transfer-info .hint']);
+    return await queryInnerText(pop, '.each-box:nth-child(1) .transfer-info .hint');
   };
 
   /**
@@ -169,7 +169,7 @@ export class InternationalFlightCreator2 {
    * 中转停留时间
    */
   stopTime2 = async (node: ElementHandle, pop: ElementHandle) => {
-    return await queryInnerText(pop, ['.each-box:nth-child(2) .transfer-info .prompt', '.each-box:nth-child(2) .transfer-info .hint']);
+    return await queryInnerText(pop, '.each-box:nth-child(2) .transfer-info .hint');
   };
 
   /**

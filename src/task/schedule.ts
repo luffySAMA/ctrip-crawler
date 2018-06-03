@@ -24,7 +24,7 @@ export class Schedule {
               setTimeout(() => {
                 task.cancel();
                 resolve();
-              }, 30 * 60 * 1000);
+              }, 60 * 1000);
             })
           ]).then(() => {
             callback();
