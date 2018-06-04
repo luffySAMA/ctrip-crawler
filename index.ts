@@ -92,8 +92,7 @@ let readFile = promisify(fs.readFile);
     const page = await browser.newPage();
     await page.setViewport({ width: 1440, height: 900 });
     await page.goto('https://passport.ctrip.com/user/login?BackUrl=http%3A%2F%2Fwww.ctrip.com%2F');
-    let success = await loginPage(page);
-    console.log(`登录${success ? '成功' : '失败'}`);
+    await loginPage(page);
     await page.close();
   }
 

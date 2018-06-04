@@ -244,11 +244,11 @@ export class InternationalFlightCreator2 {
       this.stoppedCity = '' as any;
     } else {
       await popHandler.hover();
-      await this.page.waitFor(300);
+      await this.page.waitFor(500);
       await popHandler.hover();
-      await this.page.waitFor(300);
+      await this.page.waitFor(500);
       await this.page.mouse.move(0, 0);
-      await this.page.waitFor(300);
+      await this.page.waitFor(500);
       this.popElement = await this.page.$('.popups.popup-flightinfo');
       if (this.popElement != undefined) {
         let boxList = await this.popElement.$$('.each-box');
