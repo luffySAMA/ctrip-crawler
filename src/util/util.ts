@@ -83,10 +83,9 @@ export async function queryInnerText(node: ElementHandle, selector: string | str
 
 export async function elementHTML(el: ElementHandle): Promise<string> {
   try {
-    let resultHandle = await el.executionContext().evaluateHandle((el: HTMLElement) => {
+    return await el.executionContext().evaluate((el: HTMLElement) => {
       return el.innerHTML;
     }, el);
-    return await resultHandle.jsonValue();
   } catch (error) {
     return '';
   }
@@ -94,10 +93,9 @@ export async function elementHTML(el: ElementHandle): Promise<string> {
 
 export async function elementOuterHTML(el: ElementHandle): Promise<string> {
   try {
-    let resultHandle = await el.executionContext().evaluateHandle((el: HTMLElement) => {
+    return await el.executionContext().evaluate((el: HTMLElement) => {
       return el.outerHTML;
     }, el);
-    return await resultHandle.jsonValue();
   } catch (error) {
     return '';
   }
@@ -105,10 +103,9 @@ export async function elementOuterHTML(el: ElementHandle): Promise<string> {
 
 export async function elementText(el: ElementHandle): Promise<string> {
   try {
-    let resultHandle = await el.executionContext().evaluateHandle((el: HTMLElement) => {
+    return await el.executionContext().evaluate((el: HTMLElement) => {
       return el.innerText;
     }, el);
-    return await resultHandle.jsonValue();
   } catch (error) {
     return '';
   }
