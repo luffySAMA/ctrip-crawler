@@ -138,8 +138,7 @@ export class FlightInfo {
   flight3Duration = '';
   constructor() {}
   toCsv() {
-    let csv = `
-    ${this.airline},${this.flightNum},${this.airplane},${this.fromAirport},${this.startTime},${this.flight1ArriveAddress},${this.flight1ArriveTime},${this.flight1Duration},${this.flight1OnTime},${this.stopTime},${this.stoppedCity},${this.flight2StartAddress},${this.flight2StartTime},${this.flight2Duration},${this.flight2OnTime},${this.stopTime2},${this.stoppedCity2},${this.flight2ArriveAddress},${this.flight2ArriveTime},${this.flight3StartAddress},${this.flight3StartTime},${this.flight3Duration},${this.flight3OnTime},${this.flight3ArriveAddress},${this.flight3ArriveTime},${this.toAirport},${this.endTime},${this.duration},${this.priceEconomy},${this.onTime}`;
-    return csv;
+    let csv = `${this.airline},${this.flightNum},${this.airplane},${this.fromAirport},${this.startTime},${this.flight1ArriveAddress},${this.flight1ArriveTime},${this.flight1Duration},${this.flight1OnTime},${this.stopTime},${this.stoppedCity},${this.flight2StartAddress},${this.flight2StartTime},${this.flight2Duration},${this.flight2OnTime},${this.stopTime2},${this.stoppedCity2},${this.flight2ArriveAddress},${this.flight2ArriveTime},${this.flight3StartAddress},${this.flight3StartTime},${this.flight3Duration},${this.flight3OnTime},${this.flight3ArriveAddress},${this.flight3ArriveTime},${this.toAirport},${this.endTime},${this.duration},${this.priceEconomy},${this.onTime}`.replace(/\n/g, ' ');
+    return '\n' + csv;
   }
 }

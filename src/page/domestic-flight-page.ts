@@ -50,25 +50,10 @@ export class DomesticFlightPage implements FlightPage {
         }, 200);
       });
     });
-
-    // 找出中转的
-    let flightHandlerList = await this.page.$$('.search_transfer_header.J_header_row.J_header_wrap');
-
-    for (let i = 0; i < flightHandlerList.length; i++) {
-      let flightHandler = flightHandlerList[i];
-      let popHandler = await flightHandler.$('.inb.center.J_trans_pop');
-      await popHandler.hover();
-      await this.page.waitFor(100);
-      await popHandler.hover();
-      await this.page.waitFor(300);
-      await this.page.mouse.move(0, 0);
-      await this.page.waitFor(100);
-    }
   }
   async getFlightList(): Promise<FlightInfo[]> {
-
     // 国内直飞
-    let directFlightList = await this.page.$$('.search_table_header .J_header_row');
+    let directFlightList = await this.page.$$('.search_box.Label_Flight .search_table_header');
 
     await Promise.all(
       directFlightList.map(async directFlight => {
@@ -79,11 +64,10 @@ export class DomesticFlightPage implements FlightPage {
     );
 
     // 国内中转
-    let stopFlightList = await this.page.$$('.search_transfer_header.J_header_row.J_header_wrap');
-    let stopDivList = await this.page.$$('.popup_transfer_detail');
+    let stopFlightList = await this.page.$$('.search_box.Label_Transit .search_transfer_header');
     await Promise.all(
       stopFlightList.map(async (stopFlight, i) => {
-        let creator = new StopFlightCreator(stopFlight, stopDivList[i]);
+        let creator = new StopFlightCreator(stopFlight, this.page);
         let flightInfo = await creator.createFlightInfo();
         this.flightList.push(flightInfo);
       })
@@ -93,14 +77,14 @@ export class DomesticFlightPage implements FlightPage {
 
   async fromAirportName(): Promise<string> {
     return await this.page.evaluate(() => {
-      let input = <HTMLInputElement>document.querySelector('#DCityName1');
+      let input = <HTMLInputElement>document.querySelector('#dcity0');
       return input && input.value;
     });
   }
 
   async toAirportName(): Promise<string> {
     return await this.page.evaluate(() => {
-      let input = <HTMLInputElement>document.querySelector('#ACityName1');
+      let input = <HTMLInputElement>document.querySelector('#acity0');
       return input && input.value;
     });
   }

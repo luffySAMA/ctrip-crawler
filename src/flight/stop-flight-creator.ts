@@ -1,5 +1,5 @@
-import { queryInnerHTML, queryInnerText, durationTime, queryOuterHTML } from '../util/util';
-import { ElementHandle } from 'puppeteer';
+import { queryInnerHTML, queryInnerText, durationTime } from '../util/util';
+import { ElementHandle, Page } from 'puppeteer';
 import { FlightInfo } from './flight-info';
 
 /**
@@ -7,28 +7,31 @@ import { FlightInfo } from './flight-info';
  */
 export class StopFlightCreator {
   flightInfo: FlightInfo;
+  page: Page;
   rootElement: ElementHandle;
   stopElement: ElementHandle;
   /**
    * 起飞机场
    */
-  fromAirport = '.right div+div';
+  fromAirport = '.right .airport';
   /**
    * 到达机场
    */
-  toAirport = '.left div+div';
+  toAirport = '.left .airport';
   /**
    * 航空公司
    */
-  airline = '.logo .flight_logo';
+  airline = async node => {
+    return queryInnerText(node, '.logo .flight_logo strong');
+  };
   /**
    * 航班编号
    */
-  flightNum = '.logo .flight_logo+span';
+  flightNum = '.logo .flight_logo strong+span';
   /**
    * 机型
    */
-  airplane = '.logo .craft';
+  airplane = '.logo .low_text';
   /**
    * 计划起飞时间
    */
@@ -63,29 +66,26 @@ export class StopFlightCreator {
   /**
    * 准点率
    */
-  // this.onTime = '.service span[data-bit="OnTimeRate"]';
+  // onTime = '.service .direction_black_border';
 
   /**
    * 经停
    */
   stoppedCity = async node => {
-    let cityName = await queryInnerHTML(node, '.J_trans_pop .stay-city .city-name');
+    let cityName = await queryInnerHTML(node, '.center .stay-city .city-name');
     return '中转' + cityName;
   };
 
   /**
    * 中转停留时间
    */
-  stopTime = '.J_trans_pop .stay-time';
+  stopTime = '.center .stay-time';
 
   /**
    * 第一航班到达时间
    */
   flight1ArriveTime = async () => {
-    let end = await queryInnerHTML(this.stopElement, '.first_half .arrive-time');
-    let endSpan = await queryOuterHTML(this.stopElement, '.first_half .arrive-time span');
-    end = end.replace(endSpan, '');
-    return end;
+    return queryInnerText(this.stopElement, '.first_half .arrive-time');
   };
   /**
    * 第一航班到达机场
@@ -97,17 +97,15 @@ export class StopFlightCreator {
   /**
    * 第一航班准点率
    */
-  flight1OnTime = '.service span[data-bit="OnTimeRate"]';
+  flight1OnTime = async node => {
+    return queryInnerText(node, '.service .clearfix');
+  };
   /**
    * 第一航班飞行时间
    */
   flight1Duration = async () => {
-    let start = await queryInnerHTML(this.stopElement, '.first_half .depart-time');
-    let startSpan = await queryOuterHTML(this.stopElement, '.first_half .depart-time span');
-    start = start.replace(startSpan, '');
-    let end = await queryInnerHTML(this.stopElement, '.first_half .arrive-time');
-    let endSpan = await queryOuterHTML(this.stopElement, '.first_half .arrive-time span');
-    end = end.replace(endSpan, '');
+    let start = await queryInnerText(this.stopElement, '.first_half .depart-time');
+    let end = await queryInnerText(this.stopElement, '.first_half .arrive-time');
     return durationTime(start, end);
   };
 
@@ -115,9 +113,7 @@ export class StopFlightCreator {
    * 第二航班起飞时间
    */
   flight2StartTime = async () => {
-    let start = await queryInnerHTML(this.stopElement, '.second_half .depart-time');
-    let startSpan = await queryOuterHTML(this.stopElement, '.second_half .depart-time span');
-    start = start.replace(startSpan, '');
+    let start = await queryInnerText(this.stopElement, '.second_half .depart-time');
     return start;
   };
   /**
@@ -130,29 +126,31 @@ export class StopFlightCreator {
   /**
    * 第二航班准点率
    */
-  flight2OnTime = '.service span[data-bit="OnTimeRate"]:last-child';
+  flight2OnTime = async node => {
+    return queryInnerText(node, '.service .clearfix:last-child');
+  };
   /**
    * 第二航班飞行时间
    */
   flight2Duration = async () => {
-    let start = await queryInnerHTML(this.stopElement, '.second_half .depart-time');
-    let startSpan = await queryOuterHTML(this.stopElement, '.second_half .depart-time span');
-    start = start.replace(startSpan, '');
-    let end = await queryInnerHTML(this.stopElement, '.second_half .arrive-time');
-    let endSpan = await queryOuterHTML(this.stopElement, '.second_half .arrive-time span');
-    end = end.replace(endSpan, '');
+    let start = await queryInnerText(this.stopElement, '.second_half .depart-time');
+    let end = await queryInnerText(this.stopElement, '.second_half .arrive-time');
     return durationTime(start, end);
   };
 
-  constructor(root: ElementHandle, stopElement: ElementHandle) {
+  constructor(root: ElementHandle, page: Page) {
     if (root == undefined) {
       return;
     }
     this.rootElement = root;
-    this.stopElement = stopElement;
+    this.page = page;
   }
 
   async createFlightInfo() {
+    let popHandler = await this.rootElement.$('.inb.center');
+    await popHandler.hover();
+    await this.page.waitFor(100);
+    this.stopElement = await this.page.$('.layer-wrapper');
     this.flightInfo = new FlightInfo();
     for (let propName in this.flightInfo) {
       // this.propName 存的值是选择器
@@ -164,6 +162,9 @@ export class StopFlightCreator {
         this.flightInfo[propName] = await selector(this.rootElement);
       }
     }
+
+    await this.page.mouse.move(0, 0);
+    await this.page.waitFor(100);
     return this.flightInfo;
   }
 }

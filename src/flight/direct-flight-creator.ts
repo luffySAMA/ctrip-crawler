@@ -1,5 +1,5 @@
 import { FlightInfo } from './flight-info';
-import { queryInnerHTML, queryInnerText } from '../util/util';
+import { queryInnerHTML, queryInnerText, durationTime } from '../util/util';
 import { ElementHandle } from 'puppeteer';
 
 /**
@@ -16,23 +16,25 @@ export class DirectFlightCreator {
   /**
    * 起飞机场
    */
-  fromAirport = '.right div+div';
+  fromAirport = '.right .airport';
   /**
    * 到达机场
    */
-  toAirport = '.left div+div';
+  toAirport = '.left .airport';
   /**
    * 航空公司
    */
-  airline = '.logo .flight_logo';
+  airline = async node => {
+    return queryInnerText(node, '.logo .flight_logo strong');
+  };
   /**
    * 航班编号
    */
-  flightNum = '.logo .flight_logo+span';
+  flightNum = '.logo .flight_logo strong+span';
   /**
    * 机型
    */
-  airplane = '.logo .craft';
+  airplane = '.logo .low_text';
   /**
    * 计划起飞时间
    */
@@ -46,24 +48,10 @@ export class DirectFlightCreator {
    */
   duration = async node => {
     let start = await queryInnerHTML(node, '.right .time');
-    let startHour = parseInt(start.split(':')[0]);
-    let startMinute = parseInt(start.split(':')[1]);
     let end = await queryInnerHTML(node, '.left .time');
-    let endHour = parseInt(end.split(':')[0]);
-    let endMinute = parseInt(end.split(':')[1]);
-    let hours = endHour - startHour;
-    let minutes = endMinute - startMinute;
-    if (hours < 0) {
-      // 如果结束的hour小于开始的hour，认为是第二天到达的（国内直飞不考虑隔2天）
-      hours += 24;
-    }
-    if (minutes < 0) {
-      // 如果结束minute小于开始minute，向hour借一位
-      minutes += 60;
-      hours -= 1;
-    }
-    return `${hours}h ${minutes}m`;
+    return durationTime(start, end);
   };
+
   /**
    * 经济舱价格
    */
@@ -81,15 +69,15 @@ export class DirectFlightCreator {
   /**
    * 准点率
    */
-  onTime = '.service span[data-bit="OnTimeRate"]';
+  onTime = async node => {
+    return queryInnerText(node, '.service .clearfix');
+  };
+
   /**
    * 经停
    */
   stoppedCity = async node => {
-    let temp = await queryInnerHTML(node, '.stopover .low_text');
-    // 去掉<br>
-    temp = temp.substring(0, temp.length - 4);
-    return temp.length > 0 ? '经停' + temp : '';
+    return queryInnerText(node, '.stopover');
   };
 
   async createFlightInfo(): Promise<FlightInfo> {

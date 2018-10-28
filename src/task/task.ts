@@ -42,16 +42,16 @@ export class Task {
     await page.setViewport({ width: 1440, height: 800 });
     try {
       // 进入页面
-      await page.goto(`http://flights.ctrip.com/booking/${airline}-day-1.html?ddate1=${this.date}`);
+      await page.goto(`http://flights.ctrip.com/international/search/oneway-${airline}?depdate=${this.date}`);
       let loginBtn = await page.$('#c_ph_login');
       if (loginBtn != undefined) {
         await loginBtn.click();
         await page.waitFor(1000);
         await loginPage(page);
-        await page.goto(`http://flights.ctrip.com/booking/${airline}-day-1.html?ddate1=${this.date}`);
+        await page.goto(`http://flights.ctrip.com/international/search/oneway-${airline}?depdate=${this.date}`);
       }
       let p: FlightPage;
-      if (page.url().indexOf('flights.ctrip.com/booking/') != -1) {
+      if (page.url().indexOf('flights.ctrip.com/itinerary/') != -1) {
         // 国内航班
         p = new DomesticFlightPage(page);
       } else if (page.url().indexOf('flights.ctrip.com/international/') != -1) {
