@@ -26,18 +26,6 @@ export class InternationalFlightPage2 implements FlightPage {
     await this.page.waitFor(20);
     await this.page.waitFor('img[src*=loading]', { hidden: true });
     await this.page.waitFor(20);
-    let flightList = await this.page.$$('.flight-item');
-    if (flightList.length == 0) {
-      let btnSearch = await this.page.$('.search-btn');
-      if (btnSearch != undefined) {
-        await btnSearch.click();
-        await this.page.waitFor(20);
-        await this.page.waitFor('#loading', { hidden: true });
-        await this.page.waitFor(20);
-        await this.page.waitFor('img[src*=loading]', { hidden: true });
-        await this.page.waitFor(20);
-      }
-    }
   }
 
   async beforeDownload(): Promise<void> {
@@ -58,14 +46,6 @@ export class InternationalFlightPage2 implements FlightPage {
         }, 200);
       });
     });
-
-    // 展开详情，获取准点率
-
-    // await this.page.evaluate(() => {
-    //   document.querySelectorAll('.flight-action-more a').forEach((linkMore: HTMLAnchorElement) => {
-    //     linkMore.click();
-    //   });
-    // });
   }
   async getFlightList(): Promise<FlightInfo[]> {
     // 国际

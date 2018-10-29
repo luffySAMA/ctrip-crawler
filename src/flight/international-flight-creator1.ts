@@ -13,7 +13,7 @@ export class InternationalFlightCreator1 {
    */
   fromAirport = async (node: ElementHandle) => {
     let selector = '.flight-detail-expend .flight-detail-section:nth-child(1) .section-airport';
-    return await queryInnerText(node, selector);
+    return queryInnerText(node, selector);
   };
   /**
    * 到达机场
@@ -40,7 +40,7 @@ export class InternationalFlightCreator1 {
     if (airline != '') {
       return airline;
     } else {
-      return await queryInnerHTML(node, '.flight-row .airline-name');
+      return queryInnerHTML(node, '.flight-row .airline-name');
     }
   };
   /**
@@ -69,13 +69,13 @@ export class InternationalFlightCreator1 {
    * 总飞行时长
    */
   duration = async (node: ElementHandle) => {
-    return await queryInnerText(node, '.flight-total-time');
+    return queryInnerText(node, '.flight-total-time');
   };
   /**
    * 经济舱价格
    */
   priceEconomy = async (node: ElementHandle) => {
-    return await queryInnerText(node, '.price');
+    return queryInnerText(node, '.price');
   };
   /**
    * 商务舱价格

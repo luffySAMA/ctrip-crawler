@@ -26,18 +26,6 @@ export class InternationalFlightPage1 implements FlightPage {
     await this.page.waitFor(20);
     await this.page.waitFor('.search_loading', { hidden: true });
     await this.page.waitFor(20);
-    let flightList = await this.page.$$('.flight-item');
-    if (flightList.length == 0) {
-      let btnSearch = await this.page.$('#btnSearch');
-      if (btnSearch != undefined) {
-        await btnSearch.click();
-        await this.page.waitFor(20);
-        await this.page.waitFor('.loading_animate', { hidden: true });
-        await this.page.waitFor(20);
-        await this.page.waitFor('.search_loading', { hidden: true });
-        await this.page.waitFor(20);
-      }
-    }
   }
 
   async beforeDownload(): Promise<void> {
@@ -83,14 +71,14 @@ export class InternationalFlightPage1 implements FlightPage {
   }
 
   async fromAirportName(): Promise<string> {
-    return await this.page.evaluate(() => {
+    return this.page.evaluate(() => {
       let input = <HTMLInputElement>document.querySelector('#homeCity');
       return input && input.value;
     });
   }
 
   async toAirportName(): Promise<string> {
-    return await this.page.evaluate(() => {
+    return this.page.evaluate(() => {
       let input = <HTMLInputElement>document.querySelector('#destCity');
       return input && input.value;
     });
