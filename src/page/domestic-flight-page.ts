@@ -17,7 +17,7 @@ export class DomesticFlightPage implements FlightPage {
     return new Promise<boolean>((resolve, reject) => {
       this.page.once('load', () => {
         let url = this.page.url();
-        resolve(url.indexOf('flights.ctrip.com/booking/') != -1);
+        resolve(url.indexOf('flights.ctrip.com/itinerary') != -1)
       });
     });
   }
@@ -52,6 +52,8 @@ export class DomesticFlightPage implements FlightPage {
     });
   }
   async getFlightList(): Promise<FlightInfo[]> {
+    let fromCity = await this.fromAirportName();
+    let toCity = await this.toAirportName();
     // 国内直飞
     let directFlightList = await this.page.$$('.search_box.Label_Flight .search_table_header');
 
@@ -59,19 +61,23 @@ export class DomesticFlightPage implements FlightPage {
       directFlightList.map(async directFlight => {
         let creator = new DirectFlightCreator(directFlight);
         let flightInfo = await creator.createFlightInfo();
+        flightInfo.fromCity = fromCity;
+        flightInfo.toCity = toCity;
         this.flightList.push(flightInfo);
       })
     );
 
     // 国内中转
     let stopFlightList = await this.page.$$('.search_box.Label_Transit .search_transfer_header');
-    await Promise.all(
-      stopFlightList.map(async (stopFlight, i) => {
-        let creator = new StopFlightCreator(stopFlight, this.page);
-        let flightInfo = await creator.createFlightInfo();
-        this.flightList.push(flightInfo);
-      })
-    );
+
+    for (const stopFlight of stopFlightList) {
+      let creator = new StopFlightCreator(stopFlight, this.page);
+      let flightInfo = await creator.createFlightInfo();
+      flightInfo.fromCity = fromCity
+      flightInfo.toCity = toCity
+      this.flightList.push(flightInfo);
+    }
+    
     return this.flightList;
   }
 

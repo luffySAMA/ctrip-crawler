@@ -292,6 +292,8 @@ export class InternationalFlightCreator1 {
         this.flightInfo[propName] = await queryInnerHTML(this.rootElement, selector);
       } else if (typeof selector === 'function') {
         this.flightInfo[propName] = await selector(this.rootElement);
+      } else {
+        this.flightInfo[propName] = '';
       }
     }
     return this.flightInfo;

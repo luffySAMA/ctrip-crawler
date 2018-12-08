@@ -28,7 +28,22 @@ export class InternationalFlightPage2 implements FlightPage {
     await this.page.waitFor(20);
   }
 
+  isVisible = async (selector) => {
+    return await this.page.evaluate((selector) => {
+      const e = document.querySelector(selector);
+      if (!e)
+        return false;
+      const style = window.getComputedStyle(e);
+      return style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    }, selector);
+  }
+
   async beforeDownload(): Promise<void> {
+    // 去掉广告遮盖
+    
+    if(await this.isVisible('#appd_wrap_default')){
+      this.page.click('#appd_wrap_close');
+    }
     // 滚动到底部
     await this.page.evaluate(() => {
       return new Promise(resolve => {
@@ -48,6 +63,8 @@ export class InternationalFlightPage2 implements FlightPage {
     });
   }
   async getFlightList(): Promise<FlightInfo[]> {
+    let fromCity = await this.fromAirportName()
+    let toCity = await this.toAirportName()
     // 国际
     let flightList = await this.page.$$('.flight-item');
 
@@ -55,6 +72,8 @@ export class InternationalFlightPage2 implements FlightPage {
       let flight = flightList[i];
       let creator = new InternationalFlightCreator2(flight, this.page);
       let flightInfo = await creator.createFlightInfo();
+      flightInfo.fromCity = fromCity;
+      flightInfo.toCity = toCity;
       this.flightList.push(flightInfo);
     }
 

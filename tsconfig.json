@@ -7,7 +7,7 @@
     "sourceMap": true,
     "noLib": false,
     "noEmitOnError": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,

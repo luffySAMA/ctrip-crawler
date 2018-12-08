@@ -22,16 +22,20 @@ export class StopFlightCreator {
    * 航空公司
    */
   airline = async node => {
-    return queryInnerText(node, '.logo .flight_logo strong');
+    return queryInnerText(this.stopElement, '.first_half .flight_logo');
   };
   /**
    * 航班编号
    */
-  flightNum = '.logo .flight_logo strong+span';
+  flightNum = async => {
+    return queryInnerText(this.stopElement, '.first_half .flight_logo+span');
+  }
   /**
    * 机型
    */
-  airplane = '.logo .low_text';
+  airplane = async node => {
+    return queryInnerText(node, '.logo .low_text');
+  };
   /**
    * 计划起飞时间
    */
@@ -45,8 +49,12 @@ export class StopFlightCreator {
    */
   duration = async node => {
     let start = await queryInnerHTML(node, '.right .time');
+    start = start.replace(/.*天/, '');
     let end = await queryInnerHTML(node, '.left .time');
-    return durationTime(start, end);
+    end = end.replace(/.*天/, '');
+    let night: any = await queryInnerHTML(node, '.left .c-react-frame');
+    night = night ? parseInt(night) : 0;
+    return durationTime(start, end, night);
   };
 
   /**
@@ -105,10 +113,25 @@ export class StopFlightCreator {
    */
   flight1Duration = async () => {
     let start = await queryInnerText(this.stopElement, '.first_half .depart-time');
+    start = start.replace(/.*天/, '');
     let end = await queryInnerText(this.stopElement, '.first_half .arrive-time');
-    return durationTime(start, end);
+    end = end.replace(/.*天/, '');
+    let night: any = await queryInnerHTML(this.stopElement, '.first_half .arrive-time .c-react-frame');
+    night = night ? parseInt(night) : 0;
+    return durationTime(start, end, night);
   };
-
+  /**
+   * 第二航班航空公司
+   */
+  flight2Airline = async () => {
+    return queryInnerText(this.stopElement, '.second_half .flight_logo');
+  };
+  /**
+   * 第二航班航班编号
+   */
+  flight2FlightNum = async () => {
+    return queryInnerText(this.stopElement, '.second_half .flight_logo+span');
+  };
   /**
    * 第二航班起飞时间
    */
@@ -134,8 +157,12 @@ export class StopFlightCreator {
    */
   flight2Duration = async () => {
     let start = await queryInnerText(this.stopElement, '.second_half .depart-time');
+    start = start.replace(/.*天/,'');
     let end = await queryInnerText(this.stopElement, '.second_half .arrive-time');
-    return durationTime(start, end);
+    end = end.replace(/.*天/, '');
+    let night: any = await queryInnerHTML(this.stopElement, '.second_half .arrive-time .c-react-frame');
+    night = night ? parseInt(night) : 0;
+    return durationTime(start, end, night);
   };
 
   constructor(root: ElementHandle, page: Page) {
@@ -147,7 +174,7 @@ export class StopFlightCreator {
   }
 
   async createFlightInfo() {
-    let popHandler = await this.rootElement.$('.inb.center');
+    let popHandler = await this.rootElement.$('.center');
     await popHandler.hover();
     await this.page.waitFor(100);
     this.stopElement = await this.page.$('.layer-wrapper');
@@ -160,10 +187,12 @@ export class StopFlightCreator {
         this.flightInfo[propName] = await queryInnerHTML(this.rootElement, selector);
       } else if (typeof selector === 'function') {
         this.flightInfo[propName] = await selector(this.rootElement);
+      } else {
+        this.flightInfo[propName] = '';
       }
     }
 
-    await this.page.mouse.move(0, 0);
+    await this.page.mouse.move(10, 10);
     await this.page.waitFor(100);
     return this.flightInfo;
   }

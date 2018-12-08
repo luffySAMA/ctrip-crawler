@@ -111,22 +111,23 @@ export async function elementText(el: ElementHandle): Promise<string> {
   }
 }
 
-export function durationTime(start, end): string {
+export function durationTime(start, end, night = 0): string {
   try {
     let startHour = parseInt(start.split(':')[0]);
     let startMinute = parseInt(start.split(':')[1]);
     let endHour = parseInt(end.split(':')[0]);
     let endMinute = parseInt(end.split(':')[1]);
-    let hours = endHour - startHour;
+    let hours = endHour - startHour + night * 24;
     let minutes = endMinute - startMinute;
-    if (hours < 0) {
-      // 如果结束的hour小于开始的hour，认为是第二天到达的（国内直飞不考虑隔2天）
-      hours += 24;
-    }
     if (minutes < 0) {
       // 如果结束minute小于开始minute，向hour借一位
       minutes += 60;
       hours -= 1;
+    }
+    if(hours > 24){
+      let days = Math.floor(hours / 24)
+      hours =  hours % 24;
+      return `${days}天${hours}小时${minutes}分`
     }
     return `${hours}小时${minutes}分`;
   } catch (error) {

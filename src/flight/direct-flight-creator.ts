@@ -34,7 +34,9 @@ export class DirectFlightCreator {
   /**
    * 机型
    */
-  airplane = '.logo .low_text';
+  airplane = async node => {
+    return queryInnerText(node, '.logo .low_text');
+  };
   /**
    * 计划起飞时间
    */
@@ -49,7 +51,9 @@ export class DirectFlightCreator {
   duration = async node => {
     let start = await queryInnerHTML(node, '.right .time');
     let end = await queryInnerHTML(node, '.left .time');
-    return durationTime(start, end);
+    let night: any = await queryInnerHTML(node, '.left .c-react-frame');
+    night = night ? parseInt(night) : 0;
+    return durationTime(start, end, night);
   };
 
   /**
@@ -90,6 +94,8 @@ export class DirectFlightCreator {
         this.flightInfo[propName] = await queryInnerHTML(this.rootElement, selector);
       } else if (typeof selector === 'function') {
         this.flightInfo[propName] = await selector(this.rootElement);
+      } else {
+        this.flightInfo[propName] = '';
       }
     }
     return this.flightInfo;

@@ -26,19 +26,19 @@ export class InternationalFlightCreator2 {
   /**
    * 航空公司
    */
-  airline = async (node: ElementHandle) => {
-    let selector = '.airline-name';
-    return queryInnerText(node, selector);
+  airline = async (node: ElementHandle, pop: ElementHandle) => {
+    let airline = await queryInnerHTML(pop, '.each-box:nth-child(1) .airline > .name');
+    return airline.split(' ')[0];
   };
   /**
    * 航班编号
    */
-  flightNum = async (node: ElementHandle) => {
-    let selector = '.plane-No';
-    let flightNo = await queryInnerHTML(node, selector);
-    if (flightNo != undefined && flightNo.split(' ').length > 0) {
-      return flightNo.split(' ')[0];
-    } else {
+  flightNum = async (node: ElementHandle, pop: ElementHandle) => {
+    let airline = await queryInnerHTML(pop, '.each-box:nth-child(1) .airline > .name');
+    if(airline.split(' ').length > 1){
+      return airline.split(' ')[1];
+    }
+    else {
       return '';
     }
   };
@@ -126,7 +126,25 @@ export class InternationalFlightCreator2 {
   flight1Duration = async (node: ElementHandle, pop: ElementHandle) => {
     return queryInnerHTML(pop, '.each-box:nth-child(1) .extra .consume');
   };
-
+  /**
+   * 第二航班航空公司
+   */
+  flight2Airline = async (node: ElementHandle, pop: ElementHandle) => {
+    let airline = await queryInnerHTML(pop, '.each-box:nth-child(2) .airline > .name');
+    return airline.split(' ')[0];
+  };
+  /**
+   * 第二航班航班编号
+   */
+  flight2FlightNum = async (node: ElementHandle, pop: ElementHandle) => {
+    let airline = await queryInnerHTML(pop, '.each-box:nth-child(2) .airline > .name');
+    if(airline.split(' ').length > 1){
+      return airline.split(' ')[1];
+    }
+    else {
+      return '';
+    }
+  };
   /**
    * 第二航班起飞时间
    */
@@ -177,7 +195,25 @@ export class InternationalFlightCreator2 {
   stopTime2 = async (node: ElementHandle, pop: ElementHandle) => {
     return queryInnerHTML(pop, '.each-box:nth-child(2) .transfer-info .hint');
   };
-
+  /**
+   * 第三航班航空公司
+   */
+  flight3Airline = async (node: ElementHandle, pop: ElementHandle) => {
+    let airline = await queryInnerHTML(pop, '.each-box:nth-child(3) .airline > .name');
+    return airline.split(' ')[0];
+  };
+  /**
+   * 第三航班航班编号
+   */
+  flight3FlightNum = async (node: ElementHandle, pop: ElementHandle) => {
+    let airline = await queryInnerHTML(pop, '.each-box:nth-child(3) .airline > .name');
+    if(airline.split(' ').length > 1){
+      return airline.split(' ')[1];
+    }
+    else {
+      return '';
+    }
+  };
   /**
    * 第三航班起飞时间
    */
@@ -226,44 +262,10 @@ export class InternationalFlightCreator2 {
 
   async createFlightInfo() {
     this.flightInfo = new FlightInfo();
-    // 鼠标放在中转上
+    // 点开航班详情
     let popHandler = await this.rootElement.$('.flight-detail-toggle');
-    if (popHandler == undefined) {
-      // 直飞
-      this.flight1ArriveAddress = '' as any;
-      this.flight1ArriveTime = '' as any;
-      this.flight1Duration = '' as any;
-      this.flight1OnTime = '' as any;
-      this.flight2StartAddress = '' as any;
-      this.flight2StartTime = '' as any;
-      this.flight2ArriveAddress = '' as any;
-      this.flight2ArriveTime = '' as any;
-      this.flight2Duration = '' as any;
-      this.flight2OnTime = '' as any;
-      this.flight3StartAddress = '' as any;
-      this.flight3StartTime = '' as any;
-      this.flight3ArriveAddress = '' as any;
-      this.flight3ArriveTime = '' as any;
-      this.flight3Duration = '' as any;
-      this.flight3OnTime = '' as any;
-      this.stopTime = '' as any;
-      this.stoppedCity = '' as any;
-    } else {
-      await popHandler.click();
-      await this.page.waitFor('#outerContainer');
-      this.popElement = await this.page.$('#outerContainer');
-      if (this.popElement != undefined) {
-        let boxList = await this.popElement.$$('.each-box');
-        if (boxList != undefined && boxList.length == 2) {
-          this.flight3StartAddress = '' as any;
-          this.flight3StartTime = '' as any;
-          this.flight3ArriveAddress = '' as any;
-          this.flight3ArriveTime = '' as any;
-          this.flight3Duration = '' as any;
-          this.flight3OnTime = '' as any;
-        }
-      }
-    }
+    await popHandler.click();
+    this.popElement = await this.page.$('#outerContainer');
     for (let propName in this.flightInfo) {
       // this.propName 存的值是选择器
       let selector = this[propName];
@@ -272,10 +274,13 @@ export class InternationalFlightCreator2 {
         this.flightInfo[propName] = await queryInnerHTML(this.rootElement, selector);
       } else if (typeof selector === 'function') {
         this.flightInfo[propName] = await selector(this.rootElement, this.popElement);
+      } else {
+        this.flightInfo[propName] = '';
       }
     }
-    await this.page.mouse.click(10, 10);
-    await this.page.waitFor('#outerContainer', { hidden: true });
+    let closeBtn = await this.popElement.$('.ico-close-wb');
+    await closeBtn.click();
+    await this.page.waitFor(100);
     return this.flightInfo;
   }
 }

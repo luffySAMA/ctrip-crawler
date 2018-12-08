@@ -56,13 +56,17 @@ export class InternationalFlightPage1 implements FlightPage {
     });
   }
   async getFlightList(): Promise<FlightInfo[]> {
+    let fromCity = await this.fromAirportName()
+    let toCity = await this.toAirportName()
     // 国际
     let flightList = await this.page.$$('.flight-item');
-
+    
     await Promise.all(
       flightList.map(async flight => {
         let creator = new InternationalFlightCreator1(flight);
         let flightInfo = await creator.createFlightInfo();
+        flightInfo.fromCity = fromCity
+        flightInfo.toCity = toCity
         this.flightList.push(flightInfo);
       })
     );

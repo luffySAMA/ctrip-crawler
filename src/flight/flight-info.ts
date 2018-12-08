@@ -11,6 +11,14 @@ export class FlightInfo {
    */
   toAirport = '';
   /**
+   * 起飞城市
+   */
+  fromCity = '';
+  /**
+   * 到达城市
+   */
+  toCity = '';
+  /**
    * 航空公司
    */
   airline = '';
@@ -80,11 +88,19 @@ export class FlightInfo {
   flight1Duration = '';
 
   /**
-   * 第二航班到达时间
+   * 第二航班航空公司
+   */
+  flight2Airline = '';
+  /**
+   * 第二航班航班编号
+   */
+  flight2FlightNum = '';
+  /**
+   * 第二航班起飞时间
    */
   flight2StartTime = '';
   /**
-   * 第二航班到达机场
+   * 第二航班起飞机场
    */
   flight2StartAddress = '';
   /**
@@ -113,11 +129,19 @@ export class FlightInfo {
    */
   stoppedCity2 = '';
   /**
-   * 第三航班到达时间
+   * 第三航班航空公司
+   */
+  flight3Airline = '';
+  /**
+   * 第三航班航班编号
+   */
+  flight3FlightNum = '';
+  /**
+   * 第三航班起飞时间
    */
   flight3StartTime = '';
   /**
-   * 第三航班到达机场
+   * 第三航班起飞机场
    */
   flight3StartAddress = '';
   /**
@@ -138,7 +162,7 @@ export class FlightInfo {
   flight3Duration = '';
   constructor() {}
   toCsv() {
-    let csv = `${this.airline},${this.flightNum},${this.airplane},${this.fromAirport},${this.startTime},${this.flight1ArriveAddress},${this.flight1ArriveTime},${this.flight1Duration},${this.flight1OnTime},${this.stopTime},${this.stoppedCity},${this.flight2StartAddress},${this.flight2StartTime},${this.flight2Duration},${this.flight2OnTime},${this.stopTime2},${this.stoppedCity2},${this.flight2ArriveAddress},${this.flight2ArriveTime},${this.flight3StartAddress},${this.flight3StartTime},${this.flight3Duration},${this.flight3OnTime},${this.flight3ArriveAddress},${this.flight3ArriveTime},${this.toAirport},${this.endTime},${this.duration},${this.priceEconomy},${this.onTime}`.replace(/\n/g, ' ');
+    let csv = `${this.airline},${this.flightNum},${this.airplane},${this.fromCity},${this.fromAirport},${this.startTime},${this.flight1ArriveAddress},${this.flight1ArriveTime},${this.flight1Duration},${this.flight1OnTime},${this.stopTime},${this.stoppedCity},${this.flight2Airline},${this.flight2FlightNum},${this.flight2StartAddress},${this.flight2StartTime},${this.flight2Duration},${this.flight2OnTime},${this.stopTime2},${this.stoppedCity2},${this.flight2ArriveAddress},${this.flight2ArriveTime},${this.flight3Airline},${this.flight3FlightNum},${this.flight3StartAddress},${this.flight3StartTime},${this.flight3Duration},${this.flight3OnTime},${this.flight3ArriveAddress},${this.flight3ArriveTime},${this.toAirport},${this.toCity},${this.endTime},${this.duration},${this.priceEconomy},${this.onTime}`.replace(/\n/g, ' ')
     return '\n' + csv;
   }
 }
