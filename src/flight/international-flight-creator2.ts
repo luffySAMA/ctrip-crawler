@@ -266,6 +266,11 @@ export class InternationalFlightCreator2 {
     let popHandler = await this.rootElement.$('.flight-detail-toggle');
     await popHandler.click();
     this.popElement = await this.page.$('#outerContainer');
+    let boxList = await this.popElement.$$('.each-box');
+    // 最多只统计转3次的航班
+    if (boxList != undefined && boxList.length > 3) {
+      return null;
+    }
     for (let propName in this.flightInfo) {
       // this.propName 存的值是选择器
       let selector = this[propName];

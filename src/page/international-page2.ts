@@ -72,9 +72,11 @@ export class InternationalFlightPage2 implements FlightPage {
       let flight = flightList[i];
       let creator = new InternationalFlightCreator2(flight, this.page);
       let flightInfo = await creator.createFlightInfo();
-      flightInfo.fromCity = fromCity;
-      flightInfo.toCity = toCity;
-      this.flightList.push(flightInfo);
+      if( flightInfo != null){
+        flightInfo.fromCity = fromCity;
+        flightInfo.toCity = toCity;
+        this.flightList.push(flightInfo);
+      }
     }
 
     return this.flightList;
